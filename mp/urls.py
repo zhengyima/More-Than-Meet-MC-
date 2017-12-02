@@ -23,4 +23,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^home$', home.index),
     url(r'^detail$', detail.index),
+    url(r'^form$', form.index),
+    url(r'^form_submit$', form.submit),
 ]
