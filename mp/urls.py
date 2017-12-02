@@ -14,7 +14,7 @@ Including another URLconf
 """
 from django.conf.urls import url
  
-from . import view , home
+from . import view,home,detail
 
 from django.contrib import admin
  
@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^hello$', view.hello),
     url(r'^admin/', admin.site.urls),
     url(r'^home$', home.index),
+    url(r'^detail$', detail.index),
 ]
