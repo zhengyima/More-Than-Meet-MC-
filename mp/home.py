@@ -14,7 +14,18 @@ def dictfetchall(cursor):
 def index(request):
 	    
     #return HttpResponse("Hello world ! ")
-	cursor.execute("select * from Seller,Seller_display where Seller.sno = Seller_display.sno and Seller_display.sflag = 1")
-	raw = dictfetchall(cursor)		
+	cursor.execute("select Seller.sno,sname,sgender,sage,sheight,sweight,sxz,sschool,smajor,sgrade,stime,srange,swage,sinfo,simg,slike from Seller,Seller_display where Seller.sno = Seller_display.sno and Seller_display.sflag = 1")
+	raw = dictfetchall(cursor)
+	for rawitem in raw:
+		sno = rawitem['sno']
+		lcursor = connections['default'].cursor()
+		lcursor.execute("select lno,lname from Seller,Seller_label where Seller.sno = Seller_label.sno and Seller_label.sno = %s",(sno,))
+		rawitem['labels'] = dictfetchall(lcursor)
+		#rawitem['arr'] = arr
+	#snoraw = fetchall(cursor)
+	#for item in snoraw:
+		#sno  = snoraw[0]
+		#cursor.execute()
+			
 	response = HttpResponse(json.dumps(raw),content_type="application/json")	
 	return response
