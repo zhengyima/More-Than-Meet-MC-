@@ -28,18 +28,18 @@ def submit(request):
     	need = request.GET['need']
     	sno = request.GET['sno']
     	#bno = request.GET['bno']
+	note = request.GET['note']
     	bno = 7
     	cursor = connections['default'].cursor()
-    	cursor.execute("insert into Orders values(null,%s,%s,%s,%s)",(bno,sno,hour*10,need,))
+    	cursor.execute("insert into Orders values(null,%s,%s,%s,%s,%s)",(bno,sno,hour,need,note,))
     	cursor.close()
 
     	jcursor = connections['default'].cursor()
     	jcursor.execute("select ono from Orders where bno = %s and sno = %s",(bno,sno,))
-   	 data = {}
+   	data = {}
     	data['status'] = 0
-    	if(len(jcursor.fetchall()) == 1){
+    	if len(jcursor.fetchall()) >= 1:
         	data['status'] = 1
-    	}
     	response = HttpResponse(json.dumps(data),content_type="application/json")
    	return response	
 

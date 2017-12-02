@@ -14,7 +14,7 @@ Including another URLconf
 """
 from django.conf.urls import url
  
-from . import view,home,detail
+from . import view,home,detail,form
 
 from django.contrib import admin
  
