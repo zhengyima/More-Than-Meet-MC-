@@ -21,6 +21,10 @@ def index(request):
 		lcursor = connections['default'].cursor()
 		lcursor.execute("select lno,lname from Seller,Seller_label where Seller.sno = Seller_label.sno and Seller_label.sno = %s",(sno,))
 		rawitem['labels'] = dictfetchall(lcursor)
+
+		icursor = connections['default'].cursor()
+		icursor.execute("select ino,iurl from Seller,Seller_image where Seller.sno = Seller_image.sno and Seller_image.sno = %s",(sno,))
+		rawitem['images'] = dictfetchall(icursor)
 		#rawitem['arr'] = arr
 	#snoraw = fetchall(cursor)
 	#for item in snoraw:
