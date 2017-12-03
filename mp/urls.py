@@ -14,7 +14,7 @@ Including another URLconf
 """
 from django.conf.urls import url
  
-from . import view,home,detail,form,login,order
+from . import view,home,detail,form,login,order,pay
 
 from django.contrib import admin
  
@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^login$',login.login),
     url(r'^order$',order.index),
     url(r'^pay$',pay.index),
+    url(r'^pay_notify$',pay.notify),
 ]

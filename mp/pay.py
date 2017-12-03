@@ -46,3 +46,11 @@ def index(request):
 
     response = HttpResponse(json.dumps(result), content_type="application/json")
     return response
+
+def notify(request)
+
+    data= {}
+    data['status'] = 1
+    response = HttpResponse(json.dumps(data), content_type="application/json")
+    return response
+
