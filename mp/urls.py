@@ -14,7 +14,7 @@ Including another URLconf
 """
 from django.conf.urls import url
  
-from . import view,home,detail,form
+from . import view,home,detail,form,login
 
 from django.contrib import admin
  
@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^detail$', detail.index),
     url(r'^form$', form.index),
     url(r'^form_submit$', form.submit),
+    url(r'^login$',login.login),
 ]
