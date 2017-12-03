@@ -17,6 +17,7 @@ def index(request):
     #return HttpResponse("Hello world ! ")
 	bno = request.GET['bno']
 	cursor.execute("select Orders.ono,ostatus,Seller.sno,sname,simg from Orders,Seller where Orders.sno = Seller.sno and Orders.bno = %s",(bno,))
+
 	raw = dictfetchall(cursor)
 	cursor.close()
 

@@ -30,6 +30,15 @@ def submit(request):
     	bno = request.GET['bno']
 	note = request.GET['note']
     	#bno = 7
+	scursor = connections['default'].cursor()
+	scursor.execute("select ono from Orders where bno = %s and sno = %s",(bno,sno))
+	if(len(scursor.fetchall())>0):
+		data = {}
+		data['status'] = 2
+		response = HttpResponse(json.dumps(data),content_type="application/json")
+        	return response
+		
+	
     	cursor = connections['default'].cursor()
     	cursor.execute("insert into Orders values(null,%s,%s,%s,%s,%s,sysdate(),0)",(bno,sno,hour,need,note,))
     	cursor.close()
