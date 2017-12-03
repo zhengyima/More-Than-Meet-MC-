@@ -40,12 +40,14 @@ def login(res):
     if(len(cursor.fetchall()) == 0):
         rawdata = json.loads(res.GET['rawData'])
         icursor = connections['default'].cursor()
-        icursor.execute("insert into Users values(%s,%s,%s,%s,%s,%s,%s,%s)",(userdata['openid'],rawdata['nickName'],rawdata['gender'],rawdata['language'],rawdata['city'],rawdata['province'],rawdata['country'],rawdata['avatarUrl'],))
+        icursor.execute("insert into Users values(%s,%s,%s,%s,%s,%s,%s,%s,sysdate())",(userdata['openid'],rawdata['nickName'],rawdata['gender'],rawdata['language'],rawdata['city'],rawdata['province'],rawdata['country'],rawdata['avatarUrl'],))
     	icursor.close()
     
     cursor.close()
     
-    resp = HttpResponse(json.dumps(response.text),content_type="application/json")
+    loginret = {} 
+    loginret['openid'] = userdata['openid']
+    resp = HttpResponse(json.dumps(loginret),content_type="application/json")
     #print(response.text)
 
 

@@ -27,9 +27,9 @@ def submit(request):
    	hour = request.GET['hour']
     	need = request.GET['need']
     	sno = request.GET['sno']
-    	#bno = request.GET['bno']
+    	bno = request.GET['bno']
 	note = request.GET['note']
-    	bno = 7
+    	#bno = 7
     	cursor = connections['default'].cursor()
     	cursor.execute("insert into Orders values(null,%s,%s,%s,%s,%s)",(bno,sno,hour,need,note,))
     	cursor.close()
