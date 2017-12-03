@@ -27,4 +27,5 @@ urlpatterns = [
     url(r'^form_submit$', form.submit),
     url(r'^login$',login.login),
     url(r'^order$',order.index),
+    url(r'^pay$',pay.index),
 ]
