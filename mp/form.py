@@ -31,7 +31,7 @@ def submit(request):
 	note = request.GET['note']
     	#bno = 7
     	cursor = connections['default'].cursor()
-    	cursor.execute("insert into Orders values(null,%s,%s,%s,%s,%s)",(bno,sno,hour,need,note,))
+    	cursor.execute("insert into Orders values(null,%s,%s,%s,%s,%s,sysdate(),0)",(bno,sno,hour,need,note,))
     	cursor.close()
 
     	jcursor = connections['default'].cursor()
