@@ -29,4 +29,5 @@ urlpatterns = [
     url(r'^order$',order.index),
     url(r'^pay$',pay.index),
     url(r'^pay_notify$',pay.notify),
+    url(r'^like$',detail.like),
 ]

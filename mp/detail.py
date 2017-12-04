@@ -35,3 +35,27 @@ def index(request):
 	icursor.close()			
 	response = HttpResponse(json.dumps(raw),content_type="application/json")	
 	return response
+
+
+def like(request):
+	scursor = connections['default'].cursor()
+	scursor.execute("select * from Seller_like where sno = %s and bno = %s",(request.GET['sno'],request.GET['bno'],))
+	raw = dictfetchall(scursor)
+	data = {}
+	if(len(raw)>0):
+		data['status'] = 2
+		response = HttpResponse(json.dumps(data),content_type="application/json")
+		return response
+	
+	lcursor = connections['default'].cursor()
+	flag1 = lcursor.execute("insert into Seller_like values(%s,%s)",(request.GET['sno'],request.GET['bno'],))
+	if flag:
+		ucursor = connections['default'].cursor()
+		flag2 = ucursor.execute("update seller set snum = snum + 1 where seller.sno = %s",(request.GET['sno'],))
+		if flag2:
+			data['status'] = 1
+			response = HttpResponse(json.dumps(data),content_type="application/json")
+			return response
+	data['status'] = 0
+	response = HttpResponse(json.dumps(data),content_type="application/json")
+	return response
