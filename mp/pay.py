@@ -70,7 +70,7 @@ def index(request):
          note = request.GET['note']
 #first we should know if he had orderd the same girl before
 	 scursor = connections['default'].cursor()
-         scursor.execute("select ono from Orders where bno = %s and sno = %s",(bno,sno))
+         scursor.execute("select ono from Orders where bno = %s and sno = %s and ostatus = 1",(bno,sno))
          if(len(scursor.fetchall())>0):
          	data = {}
                 data['my_status'] = 2
@@ -169,16 +169,16 @@ def notify(request):
 
 		jucursor.close()
 		
-		llcursor = connections['default'].cursor()
-                llcursor.execute("insert into logs values(null,%s,sysdate())",(dict_data['out_trade_no'],))
-                llcursor.close()
-		'''
+		#llcursor = connections['default'].cursor()
+                #llcursor.execute("insert into logs values(null,%s,sysdate())",(dict_data['out_trade_no'],))
+                #llcursor.close()
+		
 		if str(raw[0]['bneed']) != str(dict_data['total_fee']):
 			llcursor = connections['default'].cursor()
          	        llcursor.execute("insert into logs values(null,%s,sysdate())",(str(jucursor)+'@'+str(dict_data['total_fee']),))
           		llcursor.close()
         		return HttpResponse("<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>",content_type="application/xml")
-		'''
+		
 		llcursor = connections['default'].cursor()
                 llcursor.execute("insert into logs values(null,%s,sysdate())",('hieheihei',))
 		llcursor.close()
