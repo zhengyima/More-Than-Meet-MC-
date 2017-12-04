@@ -51,24 +51,39 @@ def create_sign(pay_data,merchant_key):
         stringSignTemp = '{0}&key={1}'.format(stringA, merchant_key)
         sign = hashlib.md5(stringSignTemp).hexdigest()
         return sign.upper()
-
+def test(request):
+        jucursor = connections['default'].cursor()
+        jucursor.execute("select bneed from Orders where oid = %s",('1512391903',))
+	raw = dictfetchall(jucursor)
+        return HttpResponse(raw[0]['bneed'],'text/html')
 def index(request):
 	#cursor = connections['default'].cursor()	    
     #return HttpResponse("Hello world ! ")
 	 bno = request.GET['bno']
 	#cursor.execute("select Orders.ono,ostatus,Seller.sno,sname,simg from Orders,Seller where Orders.sno = Seller.sno and Orders.bno = %s",(bno,))
+         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+         my_out_trade_no = str(int(time.time()))
 
-	#raw = dictfetchall(cursor)
-	#cursor.close()
-	 now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-   	 my_out_trade_no = str(int(time.time()))
+	 hour = request.GET['hour']
+         need = request.GET['need']
+         sno = request.GET['sno']
+         note = request.GET['note']
+#first we should know if he had orderd the same girl before
+	 scursor = connections['default'].cursor()
+         scursor.execute("select ono from Orders where bno = %s and sno = %s",(bno,sno))
+         if(len(scursor.fetchall())>0):
+         	data = {}
+                data['my_status'] = 2
+                response = HttpResponse(json.dumps(data),content_type="application/json")
+                return response	 
+# then we start to do pay job	 
 	 data = {
         	'appid': 'wx249ce8c7c0899bfc',
          	'mch_id': '1338576301',
         	'nonce_str': now,
        	 	'body': 'aa-bb',
         	'out_trade_no': my_out_trade_no,
-       	 	'total_fee': 1,
+       	 	'total_fee': need,
         	'spbill_create_ip': '118.89.233.180',
         	'notify_url': 'https://mina.mapglory.com/pay_notify',
         	'attach': '{"msg": "test"}',
@@ -81,8 +96,6 @@ def index(request):
 
     	 data['sign'] = sign
 	 data = dict_to_xml(data)
-	 #resp = HttpResponse(data, content_type="application/xml")
-         #return resp
     	 url = "https://api.mch.weixin.qq.com/pay/unifiedorder"
     	 #req = urllib2.Request(url, data, headers={'Content-Type': 'application/xml'})
     	 #result = urllib2.urlopen(req, timeout=10000).read()
@@ -104,7 +117,20 @@ def index(request):
 	 paySign = create_sign(paySign_data,'n29sni59xnn593hdm3mpds8y3n386uop')
 	 paySign_data.pop('appId')
 	 paySign_data['paySign'] = paySign 
-	
+	 
+# after do all the pay job,we start to do order
+	 cursor = connections['default'].cursor()
+         cursor.execute("insert into Orders values(null,%s,%s,%s,%s,%s,%s,sysdate(),0,%s,%s)",(my_out_trade_no,bno,sno,hour,need,note,sign,paySign,))
+         cursor.close()
+# then we judge if insert well	 
+	 jcursor = connections['default'].cursor()
+         jcursor.execute("select ono from Orders where bno = %s and sno = %s",(bno,sno,))
+         data = {}
+         paySign_data['my_status'] = 0
+         if len(jcursor.fetchall()) >= 1:
+         	paySign_data['my_status'] = 1
+		paySign_data['order_id'] = my_out_trade_no
+	 
     	 resp = HttpResponse(json.dumps(paySign_data), content_type="application/json")
     	 return resp
 
@@ -124,18 +150,40 @@ def notify(request):
 	if request.method == 'POST':
 		dict_data = xml_to_dict(request.body)
         	#logging.info(dict_data)
-		cursor = connections['default'].cursor()
-		cursor.execute("insert into logs values(null,%s,sysdate())",(dict_data['appid'],))
-		cursor.close()
-        	result_data = {
-            		'return_code': 'SUCCESS',
-            		'return_msg': 'OK'
-        	}
-        	return HttpResponse(dict_to_xml(result_data),content_type="application/xml")
-	result_data = {
-                        'return_code': 'SUCCESS',
-                        'return_msg': 'OK'
-        }
+		#cursor = connections['default'].cursor()
+		#cursor.execute("insert into logs values(null,%s,sysdate())",(dict_data['appid'],))
+		#cursor.close()
 	
-#	return dict_to_xml(result_data), {'Content-Type': 'application/xml'}	
-	return(HttpResponse(result_data, content_type="application/xml"))
+		
+        	#stringA = '&'.join(["{0}={1}".format(k, data.get(k)) for k in sorted(data)])
+         	#stringSignTemp = '{0}&key={1}'.format(stringA, "n29sni59xnn593hdm3mpds8y3n386uop")
+         #	sign = "121212"
+	#	if sign != dict_data['sign']:
+	#		llcursor = connections['default'].cursor()
+         #       	llcursor.execute("insert into logs values(null,%s,sysdate())",(sign+'@'+dict_data['sign']+'@'+dict_data['out_trade_no'],))
+          #      	llcursor.close()
+	#		return HttpResponse("<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>",content_type="application/xml")
+        	jucursor = connections['default'].cursor()
+		jucursor.execute("select bneed from Orders where oid = %s",(dict_data['out_trade_no'],))
+		raw = dictfetchall(jucursor)
+
+		jucursor.close()
+		
+		llcursor = connections['default'].cursor()
+                llcursor.execute("insert into logs values(null,%s,sysdate())",(dict_data['out_trade_no'],))
+                llcursor.close()
+		'''
+		if str(raw[0]['bneed']) != str(dict_data['total_fee']):
+			llcursor = connections['default'].cursor()
+         	        llcursor.execute("insert into logs values(null,%s,sysdate())",(str(jucursor)+'@'+str(dict_data['total_fee']),))
+          		llcursor.close()
+        		return HttpResponse("<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>",content_type="application/xml")
+		'''
+		llcursor = connections['default'].cursor()
+                llcursor.execute("insert into logs values(null,%s,sysdate())",('hieheihei',))
+		llcursor.close()
+		ucursor = connections['default'].cursor()
+        	ucursor.execute("update Orders set ostatus = 1 where oid = %s",(dict_data['out_trade_no'],))
+        	ucursor.close()
+	
+        	return HttpResponse("<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>",content_type="application/xml")

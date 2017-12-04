@@ -19,7 +19,7 @@ from . import view,home,detail,form,login,order,pay
 from django.contrib import admin
  
 urlpatterns = [
-    url(r'^hello$', view.hello),
+    url(r'^hello$', pay.test),
     url(r'^admin/', admin.site.urls),
     url(r'^home$', home.index),
     url(r'^detail$', detail.index),
