@@ -48,10 +48,10 @@ def like(request):
 		return response
 	
 	lcursor = connections['default'].cursor()
-	flag1 = lcursor.execute("insert into Seller_like values(%s,%s)",(request.GET['sno'],request.GET['bno'],))
-	if flag:
+	flag1 = lcursor.execute("insert into Seller_like values(%s,%s)",(request.GET['bno'],request.GET['sno'],))
+	if flag1:
 		ucursor = connections['default'].cursor()
-		flag2 = ucursor.execute("update seller set snum = snum + 1 where seller.sno = %s",(request.GET['sno'],))
+		flag2 = ucursor.execute("update Seller set slike = slike + 1 where Seller.sno = %s",(request.GET['sno'],))
 		if flag2:
 			data['status'] = 1
 			response = HttpResponse(json.dumps(data),content_type="application/json")
