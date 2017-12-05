@@ -1,4 +1,5 @@
-# -*- coding:utf-8 -*-
+#!/usr/bin/python
+#coding:utf-8
 from django.http import HttpResponse
 import urllib
 import json
@@ -7,15 +8,22 @@ from django.db import connections
 import logging
 import random
 import string
-import datetime
+#import datetime
+from datetime import date, datetime
 import time
 import urllib2
 import requests
 #cursor = connections['default'].cursor()
 import xml.etree.ElementTree as ET
 #from flask import Flask, request, jsonify
+#from datetime import date, datetime
+import pytz
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
 
-
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))
 def dictfetchall(cursor):
 	desc = cursor.description
 	return [
@@ -62,7 +70,7 @@ def index(request):
     #return HttpResponse("Hello world ! ")
 	 bno = request.GET['bno']
 	#cursor.execute("select Orders.ono,ostatus,Seller.sno,sname,simg from Orders,Seller where Orders.sno = Seller.sno and Orders.bno = %s",(bno,))
-         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
          my_out_trade_no = str(int(time.time()))
 
 	 hour = request.GET['hour']
@@ -165,7 +173,7 @@ def notify(request):
           #      	llcursor.close()
 	#		return HttpResponse("<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>",content_type="application/xml")
         	jucursor = connections['default'].cursor()
-		jucursor.execute("select bno,bneed,prepay_id from Orders where oid = %s",(dict_data['out_trade_no'],))
+		jucursor.execute("select bno,bneed,otime,sname,prepay_id from Orders,Seller where oid = %s and Orders.sno = Seller.sno",(dict_data['out_trade_no'],))
 		raw = dictfetchall(jucursor)
 
 		jucursor.close()
@@ -198,7 +206,7 @@ def notify(request):
                         llcursor.execute("insert into logs values(null,%s,sysdate())",('hie3',))
                         llcursor.close()
 			url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token="+access_token
-			tmpdata={"touser":raw[0]['bno'],"template_id":"2o5prNY_ljLX4tFt_9t2MDY2jI0xSpX3U9g3mkqF6iI","form_id":raw[0]['prepay_id'],"data":{"keyword1": {"value": "339208499", "color": "#173177"}, "keyword2": {"value": "2015.01.05.12:30", "color": "#173177"}, "keyword3": {"value": "test", "color": "#173177"} , "keyword4": {"value": "taian", "color": "#173177"}}}
+			tmpdata={"touser":raw[0]['bno'],"template_id":"2o5prNY_ljLX4tFt_9t2MDY2jI0xSpX3U9g3mkqF6iI","form_id":raw[0]['prepay_id'],"data":{"keyword1": {"value": json_serial(raw[0]['otime']), "color": "#000000"}, "keyword2": {"value": dict_data['out_trade_no'], "color": "#000000"}, "keyword3": {"value": str(int(raw[0]['bneed'])/100)+"元", "color": "#000000"} , "keyword4": {"value": "与"+raw[0]['sname']+"的约定", "color": "#000000"}}}
 
 			req = urllib2.Request(url, json.dumps(tmpdata), headers={'Content-Type': 'application/json'})
          		result = urllib2.urlopen(req, timeout=30).read()

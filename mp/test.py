@@ -1,3 +1,2 @@
-file_object = open('thefile.txt', 'w')
-file_object.write("a")
-file_object.close( )
+data={"a":u"你好"}
+print data
