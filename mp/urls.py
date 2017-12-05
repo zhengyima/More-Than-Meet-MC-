@@ -17,6 +17,7 @@ from django.conf.urls import url
 from . import view,home,detail,form,login,order,pay
 
 from django.contrib import admin
+import settings  
  
 urlpatterns = [
     url(r'^hello$', pay.test),
@@ -30,4 +31,5 @@ urlpatterns = [
     url(r'^pay$',pay.index),
     url(r'^pay_notify$',pay.notify),
     url(r'^like$',detail.like),
+    url(r'^static/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.STATIC_ROOT }),  
 ]
