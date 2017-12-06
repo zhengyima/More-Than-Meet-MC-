@@ -87,7 +87,7 @@ def index(request):
                 return response	 
 # then we start to do pay job	 
 	 data = {
-        	'appid': 'wx249ce8c7c0899bfc',
+        	'appid': 'wx96cd401177282448',
          	'mch_id': '1338576301',
         	'nonce_str': now,
        	 	'body': 'aa-bb',
@@ -117,7 +117,7 @@ def index(request):
 	 result = urllib2.urlopen(req, timeout=30).read()
     	 prepay_id = xml_to_dict(result).get('prepay_id')
 	 paySign_data = {
-                'appId': 'wx249ce8c7c0899bfc',
+                'appId': 'wx96cd401177282448',
                 'timeStamp': my_out_trade_no,
                 'nonceStr': now,
                 'package': 'prepay_id={0}'.format(prepay_id),
@@ -198,7 +198,7 @@ def notify(request):
                	 	llcursor.execute("insert into logs values(null,%s,sysdate())",('hie2',))
                 	llcursor.close()
 			url = "https://api.weixin.qq.com/cgi-bin/token"
-			querystring = {"grant_type":"client_credential","appid":"wx249ce8c7c0899bfc","secret":"8e946257c7649c08241cfc19dc551482"}
+			querystring = {"grant_type":"client_credential","appid":"wx96cd401177282448","secret":"3bd6456f8d335d62ce361fe17bbef3c2"}
 			headers = {}
 			response = requests.request("GET", url, headers=headers, params=querystring)
 			access_token = json.loads(response.text)['access_token']
@@ -206,7 +206,7 @@ def notify(request):
                         llcursor.execute("insert into logs values(null,%s,sysdate())",('hie3',))
                         llcursor.close()
 			url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token="+access_token
-			tmpdata={"touser":raw[0]['bno'],"template_id":"2o5prNY_ljLX4tFt_9t2MDY2jI0xSpX3U9g3mkqF6iI","form_id":raw[0]['prepay_id'],"data":{"keyword1": {"value": json_serial(raw[0]['otime']), "color": "#000000"}, "keyword2": {"value": dict_data['out_trade_no'], "color": "#000000"}, "keyword3": {"value": str(int(raw[0]['bneed'])/100)+"元", "color": "#000000"} , "keyword4": {"value": "与"+raw[0]['sname']+"的约定", "color": "#000000"}}}
+			tmpdata={"touser":raw[0]['bno'],"template_id":"issFJ6vlxE37dJFehqnQ1xfVa4Ekzm2Hg6mHflWlGk8","form_id":raw[0]['prepay_id'],"data":{"keyword1": {"value": json_serial(raw[0]['otime']), "color": "#000000"}, "keyword2": {"value": dict_data['out_trade_no'], "color": "#000000"}, "keyword3": {"value": str(int(raw[0]['bneed'])/100)+"元", "color": "#000000"} , "keyword4": {"value": "与"+raw[0]['sname']+"的约定", "color": "#000000"}}}
 
 			req = urllib2.Request(url, json.dumps(tmpdata), headers={'Content-Type': 'application/json'})
          		result = urllib2.urlopen(req, timeout=30).read()

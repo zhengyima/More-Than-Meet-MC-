@@ -66,7 +66,7 @@ class Seller(models.Model):
 
 class SellerDisplay(models.Model):
     sno = models.IntegerField(primary_key=True)
-    sflag = models.IntegerField(primary_key=True)
+    sflag = models.IntegerField()
 
     class Meta:
         managed = False
